@@ -1,0 +1,6 @@
+put ~/.ssh/id_rsa.pub  ~/.ssh/id_rsa.pub 
+chmod 777 ~/.ssh/id_rsa.pub
+chmod 777 ~/.ssh/authorized_keys
+ren id_rsa.pub ~/.ssh/authorized_keys
+chmod 644 ~/.ssh/authorized_keys
+

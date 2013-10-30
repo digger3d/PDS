@@ -1,0 +1,45 @@
+$config="<?php"."\n\n"
+.'$setup="'."$setup\";\n\n"
+.'$SCHEDULEDRUN="'.$_POST["SCHEDULEDRUN"].'";'."\n"
+.'$REMOTEWWWROOT="'.$_POST["REMOTEWWWROOT"].'";'."\n"
+.'$REMOTESSHHOST="'.$_POST["REMOTESSHHOST"].'";'."\n"
+.'$REMOTESTORAGESELECTION="'.$_POST["REMOTESTORAGESELECTION"].'";'."\n"
+.'$REMOTEDIRSELECTION="'.$_POST["REMOTEDIRSELECTION"].'";'."\n"
+.'$REMOTEDBSELECTION="'.$_POST["REMOTEDBSELECTION"].'";'."\n"
+.'$REMOTESSHUSER="'.$_POST["REMOTESSHUSER"].'";'."\n"
+.'$REMOTESSHPASSWORD="'.$_POST["REMOTESSHPASSWORD"].'";'."\n"
+.'$REMOTEROOTPWD="'.$_POST["REMOTEROOTPWD"].'";'."\n"
+.'$REMOTEMYSQLUSER="'.$_POST["REMOTEMYSQLUSER"].'";'."\n"
+.'$REMOTEMYSQLPASSWORD="'.$_POST["REMOTEMYSQLPASSWORD"].'";'."\n"
+.'$REMOTEMYSQLHOST="'.$_POST["REMOTEMYSQLHOST"].'";'."\n"
+.'$REMOTEMYSQLPATH="'.$_POST["REMOTEMYSQLPATH"].'";'."\n"
+.'$REMOTEMEDIADIR="'.$_POST["REMOTEMEDIADIR"].'";'."\n"
+.'$REMOTEMYSQLROOTPWD="'.$_POST["REMOTEMYSQLROOTPWD"].'";'."\n"
+.'$LOCALDIRSELECTION="'.$_POST["LOCALDIRSELECTION"].'";'."\n"
+.'$LOCALSTORAGESELECTION="'.$_POST["LOCALSTORAGESELECTION"].'";'."\n"
+.'$LOCALMEDIADIR="'.$_POST["LOCALMEDIADIR"].'";'."\n"
+.'$LOCALWWWROOT="'.$_POST["LOCALWWWROOT"].'";'."\n"
+.'$LOCALDBSELECTION="'.$_POST["LOCALDBSELECTION"].'";'."\n"
+.'$LOCALTARFILENAME="'.$_POST["LOCALTARFILENAME"].'";'."\n"
+.'$LOCALMYSQLHOST="'.$_POST["LOCALMYSQLHOST"].'";'."\n"
+.'$LOCALMYSQLUSER="'.$_POST["LOCALMYSQLUSER"].'";'."\n"
+.'$LOCALMYSQLPASSWORD="'.$_POST["LOCALMYSQLPASSWORD"].'";'."\n"
+.'$CROSSDEPLOY="'.$_POST["CROSSDEPLOY"].'";'."\n"
+.'$BACKDEPLOY="'.$_POST["BACKDEPLOY"].'";'."\n"
+.'$STORELOCALLY="'.$_POST["STORELOCALLY"].'";'."\n"
+.'$FORCEUPLOAD="'.$_POST["FORCEUPLOAD"].'";'."\n"
+.'$LOCALHOSTSFILE="'.$_POST["LOCALHOSTSFILE"].'";'."\n"
+.'$LOCALHOSTIPBASE="'.$_POST["LOCALHOSTIPBASE"].'";'."\n"
+.'$LOCALHOSTIPSHIFT='.$_POST["LOCALHOSTIPSHIFT"].';'."\n"
+.'$LOCALSSHPASSWORD="'.$_POST["LOCALSSHPASSWORD"].'";'."\n"
+.'$LOCALTEMPDIR="'.$_POST["LOCALTEMPDIR"].'";'."\n"
+."?>";
+$handle=fopen($conffile,'w');
+if (!$handle) {
+     echo "Trying to gain write access\n<br>";
+     die("Write access was denied, go back and try again"); 
+}
+fputs($handle,$config);
+echo "Configuration is successefully written to $conffile ...";
+fclose($handle);
+}

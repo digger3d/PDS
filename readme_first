@@ -1,0 +1,16 @@
+This is a beta release. Not guaranteed to work at all. But if you are reading this it worked in Ubuntu to upload this file to my FreeBSD website.
+READ SYSTEM REQUIREMENTS BEFORE INSTALLATION!!!
+SYSTEM REQUIREMENTS:
+Local:
+Ubuntu, Apache2, MySQL5, bash, glade, PHP
+Remote:
+FreeBSD, Apache2, MySQL, PHP, bash,  SSH access
+
+To install put it anywhere in your local Ubuntu home directory,  run install.sh from the konsole and follow the instructios.
+do not forget to configure, using http://pds or http://localhost or GUI(desktop shortcut)
+
+Enjoy!
+
+WBR
+Anton Volkonskiy 
+ACA Digger3D

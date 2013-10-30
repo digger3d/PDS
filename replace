@@ -1,0 +1,3 @@
+head -n-44 pdt.glade > pds3.glade
+cat template.glade >>pds3.glade
+

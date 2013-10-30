@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Rescan hosts
+Type=Application
+Terminal=false
+Icon[en_US]=gnome-panel-launcher
+Exec=xterm /var/www/pds/apache.sh
+Name[en_US]=Rescan hosts
+Icon=/var/www/pds/pds.png
+Comment[en_US]=Restarts apache, rescans hosts, need to run it when new hosts added 
+Comment=Restarts apache, rescans hosts, need to run it when new hosts added 
+GenericName[en_US]=

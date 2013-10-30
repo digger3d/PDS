@@ -1,0 +1,10 @@
+#! /bin/bash
+
+DUMP=$(autoglade $0.glade)
+echo "$DUMP" > ./dump.txt
+eval "$DUMP"
+cat ./dump.txt
+
+
+
+

@@ -1,0 +1,323 @@
+#!/bin/bash
+#PDS startup on *buntu script
+#/************************************************************************/
+#/* Personal Deployment System 			                       	 */
+#/* ===========================                                        	 */
+#/*                                                                 	 */
+#/* Copyright (c) 2008 by Anton Volkonskiy                          	 */
+#/* http://digger3d.com							 */
+#/*                                                                 	 */
+#/* This program is free software. You can redistribute it and/or modify */
+#/* it under the terms of the GNU General Public License as published by */
+#/* the Free Software Foundation; either version 2 of the License.       */
+#/************************************************************************/
+cd /var/www/pds
+userid=${USER}
+if [ $userid = "root" ]; then
+    echo "You have to run it not as root and you need to have sudo configured."
+    exit
+fi
+
+     
+# 1. create authorization realm (passwordless ssh)
+ if [ ! -e ~/.ssh ]
+ then
+	mkdir ~/.ssh
+ fi
+  if [ ! -e ~/.ssh/id_rsa.pub ]       # Check if file exists.
+  then
+    echo "~/.ssh/id_rsa.pub does not exist. Creating authorization realm"; echo 
+	ssh-keygen -t rsa 	
+echo "Now you have to add your local /.ssh/id_rsa.pub to the remote ~/.ssh/authorized_keys and try again"
+exit
+fi
+
+	#ssh $REMOTESSHUSER:$REMOTESSHPASSWORD@$REMOTESSHHOST mkdir ~/.ssh/keys
+
+#	scp ~/.ssh/id_rsa.pub $REMOTESSHUSER@$REMOTESHHOST:~/ && ssh $REMOTESSHUSER@$REMOTESSHHOST cat ~/id_dsa.pub >> ~/.ssh/authorized_keys ; chmod 644 ~/.ssh/authorized_keys
+#        ssh $REMOTESSHUSER@$REMOTESSHHOST 
+#scp -r ~/.ssh/id_rsa.pub $REMOTESSHUSER:$REMOTESSHPASSWORD@$REMOTESSHHOST:~/.ssh/keys
+	#scp -r ~/.ssh/id_rsa.pub $REMOTESSHUSER:$REMOTESSHPASSWORD@$REMOTESSHHOST:.ssh/keys
+	#cat .ssh/keys>>~/.ssh/authorized_keys
+
+ssh $REMOTESSHUSER@$REMOTESSHHOST ls
+if [ $? = 0 ]; then
+	echo "authorization established"
+else
+	echo "Can't authorize, you have to manually install automatic ssh authorization."
+fi
+
+#ssh $REMOTESSHUSER:$REMOTESSHPASSWORD@$REMOTESSHHOST mkdir ~/.ssh
+#ssh $REMOTESSHUSER:$REMOTESSHPASSWORD@$REMOTESSHHOST touch ~/.ssh/id_rsa.pub & chmod 777 ~/.ssh/id_rsa.pub 
+#scp ~/.ssh/id_rsa.pub $REMOTESSHUSER@$REMOTESHHOST:~/
+#ssh $REMOTESSHUSER@$REMOTESSHHOST cat ~/id_dsa.pub >> ~/.ssh/authorized_keys & chmod 644 ~/.ssh/authorized_keys
+
+echo "PDS startup on *buntu script s checking systen configuration, if it fails check system requirements at http://digger3d.com..."
+echo "WARNING!!! This system is not intend to be an online control panel."
+echo "This is your ultimate deploy/backup/develop *NIX/Linux system enhancement for web developers"
+echo "So, if this installation script is running on a live online server - DELETE IT RIGHT NOW!!!"
+
+echo 0 | php5
+if [ $? = 0 ]; then
+	echo "PHP5 is installed"
+else
+	echo "PHP5 is not installed, can not continue, check system requirements at digger3d.com..."
+fi
+
+# 2. check mysql, apache
+
+mysql --version
+if [ $? = 0 ]; then
+	echo "MySQL check Complete"
+else
+	echo "MySQL check failed, check system requirements at digger3d.com..."
+	exit
+fi
+#sudo apache2 force-reload
+#sudo apache2ctl -k stop
+#if [ $? = 0 ]; then
+	#echo "Apache2 is stopped, installing PDS..."
+#else
+#	echo "Apache2 was not running start it and try again..."
+
+#fi
+
+cd /var/www/pds
+php5</var/www/pds/install.php
+
+if [ $? = 0 ]; then
+	echo "apache start script, hosts and directories are up to date."
+else
+	echo "hosts write error, result code is $?, check system settings, file permissions or hardware or check system requirements at digger3d.com..."
+	exit
+fi
+
+
+echo $userid
+chown -R $userid /var/www/pds
+chmod -R 777 /var/www/pds 
+
+
+if [ $? = 0 ]; then
+	echo "Permissions are applied"
+else
+	echo "Unknown permissions/filesystem error."
+	exit
+fi
+#
+#start apache
+#sudo apache2ctl -k start
+#if [ $? = 0 ]; then
+#	echo "Apache is running, point your browser to http://pds/"
+#else
+#	echo "Apache can not start, result code is $?, check system settings or check system requirements at digger3d.com..."
+#	exit
+#fi
+echo "Creating GUI for a given configuration"
+#need to replace everything in pds.template.glade and add the result to pds.glade
+#sed s/eth0/eth1/g file1 >  file2
+#Reset the interface line numbers are subject to change
+#lineslong=size pdt.glade
+##################################################################################     TAKE CARE OF THE FOLLOWING 
+##################################################################################     LINES AFTER USING GLADE
+# Create header
+head -n25 pdt.glade > pds.glade
+#Cut out the body of a site interface
+head -n453 pdt.glade > template.glade
+tail -n428 template.glade > pds.template.glade
+# Create footer
+tail -n115 pdt.glade > pds.footer.glade
+
+for FILENAME in *.conf.php; do
+#prepare and include particular host settings
+	HNAME=`echo $FILENAME | sed 's/.\{9\}$//'`
+	cp pds.template.glade template1.glade
+	#php2bash
+	sed 's/^.\{1\}//g' $FILENAME>$HNAME.tmp
+	sed 's/;//g' $HNAME.tmp>$HNAME.sh
+	sed 's/?php//g' $HNAME.sh>$HNAME.tmp
+	sed 's/?php//g' $HNAME.tmp>$HNAME.sh
+	sed 's/>//g' $HNAME.sh>$HNAME.tmp
+	sed 's,/,\/,g' $HNAME.tmp>$HNAME.sh
+	echo "about to suck in the values"
+	. $HNAME.sh
+	#set -x
+	echo "working for $HNAME at $REMOTESSHHOST in the $REMOTEWWWROOT" 
+	#Replace variables
+	
+	SC='s,$REMOTESSHHOST,'$REMOTESSHHOST",g"
+	sed "$SC" template1.glade>template.glade
+	#echo $REMOTESSHHOST
+	SC='s,$REMOTESSHUSER,'$REMOTESSHUSER",g"
+	sed "$SC" template.glade>template1.glade
+	#echo $REMOTESSHUSER
+	SC='s,$REMOTESSHPASSWORD,'$REMOTESSHPASSWORD",g"
+	sed "$SC" template1.glade>template.glade
+	#echo $REMOTESSHPASSWORD
+	SC='s,$REMOTEMYSQLHOST,'$REMOTEMYSQLHOST",g" 
+	sed "$SC" template.glade>template1.glade
+	#echo $REMOTEMYSQLHOST
+	SC='s,$REMOTEDBSELECTION,'$REMOTEDBSELECTION",g" 
+	sed "$SC" template1.glade>template.glade
+	#echo $REMOTEDBSELECTION
+	SC='s,$REMOTEMYSQLUSER,'$REMOTEMYSQLUSER",g" 
+	sed "$SC" template.glade>template1.glade
+	#echo $REMOTEMYSQLUSER
+	SC='s,$REMOTEMYSQLPASSWORD,'$REMOTEMYSQLPASSWORD",g" 
+	sed "$SC" template1.glade>template.glade
+	#echo $REMOTEMYSQLPASSWORD
+	SC='s,$REMOTEWWWROOT,'$REMOTEWWWROOT",g" 
+	sed "$SC" template.glade>template1.glade
+	#echo $REMOTEWWWROOT
+	SC='s,$REMOTEFTPUSER,'$REMOTEFTPUSER",g" 
+	sed "$SC" template1.glade>template.glade
+	#echo $REMOTEFTPUSER
+	SC='s,$REMOTEFTPPASSWORD,'$REMOTEFTPPASSWORD",g" 
+	sed "$SC" template.glade>template1.glade
+	#echo $REMOTEFTPPASSWORD
+	SC='s,id=",id="'$HNAME",g"
+	sed "$SC" template1.glade>template.glade
+	#echo $SC
+	SC='s,TITLE,'$HNAME",g"
+	sed "$SC" template.glade>template1.glade
+	#SC='s,table3,'$HNAME",g"
+	#sed "$SC" template1.glade>template.glade
+	#echo $SC
+	#Add host
+	cat template1.glade >>pds.glade
+done
+cat pds.footer.glade >>pds.glade
+echo "Interface is generated, starting GUI"
+DUMP=$(autoglade $0.glade)
+echo "$DUMP" > ./dump.txt
+#eval "$DUMP"
+#cat ./dump.txt 
+#head -n-1 ./dump.txt>allhosts.conf
+#read $keyboard_input
+for FILENAME in *.conf.php; do
+	head -n17 ./dump.txt>./current
+	tail -n+18 ./dump.txt > ./dump1
+#read $keyboard_input
+	cp ./dump1 ./dump.txt
+
+	HNAME=`echo $FILENAME | sed 's/.\{9\}$//'`
+#s/#.*//
+	SC="s,^$HNAME,,"
+	sed "$SC" ./current>./dump1
+
+#SC="s/\'/\"/g"
+	sed /\"/s/\'/\"/g ./dump1 >./current
+
+	echo $SC
+	sed $SC current > dump1
+	. ./dump1
+	sed 's/^.\{1\}//g' $FILENAME>$HNAME.tmp
+	sed 's/;//g' $HNAME.tmp>$HNAME.sh
+	sed 's/?php//g' $HNAME.sh>$HNAME.tmp
+	sed 's/?php//g' $HNAME.tmp>$HNAME.sh
+	sed 's/>//g' $HNAME.sh>$HNAME.tmp
+	sed 's,/,\/,g' $HNAME.tmp>$HNAME.sh
+	echo "about to suck in the values"
+	. $HNAME.sh
+#load last moment overrides
+	. ./dump1
+	echo "Creating current deploy.conf for $HNAME"
+	cp $HNAME.sh deploy.conf 
+#	read $key_inp
+	echo "Parsing GUI output for $HNAME"
+	
+	if [ $DBrem2loc = 'True' ]; then
+		echo "Getting the database from remote for $HNAME "
+		bash ./dbdown.sh
+		if [ $? = 0 ]; then
+			echo "Local database update for $HNAME is completed"
+		else
+			echo "Local database update $HNAME backup is failed"
+		fi
+	else
+		echo "Update local database from remote $HNAME is not selected to execute."
+	fi
+				
+	if [ $DBloc2rem = 'True' ]; then
+		echo "Updating the remote database from local for $HNAME"
+		bash ./dbup.sh
+		if [ $? = 0 ]; then
+			echo "Update remote from local database for $HNAME is completed"
+		else
+			echo "Local $HNAME restore is failed"
+		fi
+	else
+		echo "Update remote from local database for $HNAME is not selected to execute."
+	fi
+	
+	
+	
+	if [ $UpdateLocal = 'True' ]; then
+		echo "Updating local $HNAME"
+		bash ./download.sh
+		if [ $? = 0 ]; then
+			echo "Local $HNAME update is  completed"
+		else
+		echo "Local $HNAME update is failed"
+		fi
+	else
+		echo "Update local $HNAME is not selected to execute."
+	fi
+	
+	
+	if [ $UpdateRemote = 'True' ]; then
+		echo "Updating remote $HNAME"
+		bash ./upload.sh
+		if [ $? = 0 ]; then
+			echo "Remote $HNAME update completed"
+		else
+		echo "Remote $HNAME update is failed"
+		fi
+	else
+		echo "Update remote $HNAME is not selected to execute."
+	fi
+	
+
+
+	if [ $syncfsdown = 'True' ]; then
+		echo "Synchronizing local fs with remote $HNAME"
+		bash ./syncfsdown.sh
+		if [ $? = 0 ]; then
+			echo "$HNAME synchronization is completed"
+		else
+		echo "$HNAME synchronization is failed"
+		fi
+	else
+		echo "Synchronization for $HNAME is not selected to execute."
+	fi
+
+
+		
+	if [ $syncfsup = 'True' ]; then
+		echo "Synchronizing remote filesystem with local for $HNAME"
+		bash ./syncfsup.sh
+		if [ $? = 0 ]; then
+			echo "Remote filesystem synchronization for $HNAME is completed"
+		else
+		echo "$HNAME Remote filesystem synchronization is failed"
+		fi
+	else
+		echo "Remote filesystem synchronization is not selected to execute."
+	fi
+
+
+done
+
+#set +x
+#gtk.RESPONSE_NONE=-1
+#gtk.RESPONSE_REJECT=-2
+#gtk.RESPONSE_ACCEPT=-3
+#gtk.RESPONSE_DELETE_EVENT=-4
+#gtk.RESPONSE_OK=-5
+#gtk.RESPONSE_CANCEL=-6
+#gtk.RESPONSE_CLOSE=-7
+#gtk.RESPONSE_YES=-8
+#gtk.RESPONSE_NO=-9
+#gtk.RESPONSE_APPLY=-10
+#gtk.RESPONSE_HELP=-11
+
